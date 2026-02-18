@@ -561,11 +561,11 @@ For questions, issues, or collaboration:
 
 ## 🚀 Roadmap
 
-### ✅ Completed (Month 1)
-- [x] Functional Encryption implementation
-- [x] MPC protocols with Shamir's Secret Sharing
-- [x] Backend REST API
-- [x] MongoDB integration
+### ✅ Ongoing (Month 1)
+- [] Functional Encryption implementation
+- [] MPC protocols with Shamir's Secret Sharing
+- [] Backend REST API
+- [] MongoDB integration
 
 ### 🔄 In Progress (Month 2)
 - [ ] React.js frontend dashboard
