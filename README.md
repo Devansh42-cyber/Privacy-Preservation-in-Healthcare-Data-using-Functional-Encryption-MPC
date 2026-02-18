@@ -535,7 +535,7 @@ Department of Computer Science & Engineering
 - **Devansh Baluni** (500119907)
 - **Bhumi Saraswat** (500123867)
 
-**Supervisor:** [Professor Name]  
+**Supervisor:** Rahat Naz  
 **Academic Year:** 2025-2026
 
 ---
@@ -562,10 +562,10 @@ For questions, issues, or collaboration:
 ## 🚀 Roadmap
 
 ### ✅ Ongoing (Month 1)
-- [] Functional Encryption implementation
-- [] MPC protocols with Shamir's Secret Sharing
-- [] Backend REST API
-- [] MongoDB integration
+- [ ] Functional Encryption implementation
+- [ ] MPC protocols with Shamir's Secret Sharing
+- [ ] Backend REST API
+- [ ] MongoDB integration
 
 ### 🔄 In Progress (Month 2)
 - [ ] React.js frontend dashboard
