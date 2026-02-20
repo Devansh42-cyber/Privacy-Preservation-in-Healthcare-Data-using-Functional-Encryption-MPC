@@ -1,2 +1,3 @@
 # Privacy Preservation in Healthcare Data using Functional Encryption MPC
 This project focuses on securing sensitive healthcare data while enabling meaningful computation and analysis. It explores privacy-preserving cryptographic techniques such as Functional Encryption (FE) and Secure Multi-Party Computation (MPC) to allow authorized entities to compute specific outputs without accessing raw patient data.
+
