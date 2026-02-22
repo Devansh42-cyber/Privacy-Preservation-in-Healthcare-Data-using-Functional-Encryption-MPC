@@ -549,7 +549,7 @@ Department of Computer Science & Engineering
 
 ---
 
-## 📧 Contact
+## Contact
 
 For questions, issues, or collaboration:
 
