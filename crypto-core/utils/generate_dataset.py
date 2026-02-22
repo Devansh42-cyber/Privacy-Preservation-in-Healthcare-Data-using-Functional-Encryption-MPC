@@ -8,5 +8,6 @@ def generate_patient():
         "blood_pressure": random.randint(90,160),
         "risk_score": random.randint(1,100)
     }
+
 def generate_dataset(n=100):
     return [generate_patient() for _ in range(n)]

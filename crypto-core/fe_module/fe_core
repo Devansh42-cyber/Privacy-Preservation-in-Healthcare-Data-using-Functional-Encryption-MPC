@@ -9,5 +9,6 @@ def vector_to_list(patient):
         patient["blood_pressure"],
         patient["risk_score"]
     ]
+
 def inner_product(vec1, vec2):
     return mod_p(sum(a*b for a, b in zip(vec1, vec2)))
