@@ -4,7 +4,6 @@ const AuthContext = createContext(null);
 
 // Mock users: 4 roles
 const MOCK_USERS = [
-
   {
     id: 'admin001',
 
@@ -16,10 +15,8 @@ const MOCK_USERS = [
 
     name: 'System Administrator',
 
-    accessLevel: 4
+    accessLevel: 4,
   },
-
-
 
   {
     id: 'owner001',
@@ -32,10 +29,8 @@ const MOCK_USERS = [
 
     name: 'Healthcare Data Owner',
 
-    accessLevel: 3
+    accessLevel: 3,
   },
-
-
 
   {
     id: 'analyst001',
@@ -48,10 +43,8 @@ const MOCK_USERS = [
 
     name: 'Research Analyst',
 
-    accessLevel: 2
+    accessLevel: 2,
   },
-
-
 
   {
     id: 'officer001',
@@ -64,16 +57,17 @@ const MOCK_USERS = [
 
     name: 'Privacy Officer',
 
-    accessLevel: 1
+    accessLevel: 1,
   },
-
 ];
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loginError, setLoginError] = useState('');
 
   const login = (username, password) => {
-    const found = MOCK_USERS.find(u => u.username === username && u.password === password);
+    const found = MOCK_USERS.find(
+      (u) => u.username === username && u.password === password
+    );
     if (found) {
       setUser(found);
       setLoginError('');

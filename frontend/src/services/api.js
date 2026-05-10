@@ -6,7 +6,7 @@ const API = axios.create({
 });
 
 // Intercept to add auth token
-API.interceptors.request.use(cfg => {
+API.interceptors.request.use((cfg) => {
   const token = localStorage.getItem('token');
   if (token) cfg.headers.Authorization = `Bearer ${token}`;
   return cfg;
@@ -15,10 +15,13 @@ API.interceptors.request.use(cfg => {
 // --- Encryption ---
 export const encryptPatientData = (data) => API.post('/encrypt', data);
 export const uploadDataset = (formData) =>
-  API.post('/encrypt/batch', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+  API.post('/encrypt/batch', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 
 // --- Key Management ---
-export const requestFunctionKey = (payload) => API.post('/request-key', payload);
+export const requestFunctionKey = (payload) =>
+  API.post('/request-key', payload);
 
 // --- Compute ---
 export const computeFunction = (payload) => API.post('/compute', payload);
@@ -27,8 +30,7 @@ export const computeFunction = (payload) => API.post('/compute', payload);
 export const initiateMPC = (payload) => API.post('/mpc/initiate', payload);
 
 // --- Audit ---
-export const getAuditLogs =
-  () => api.get('/api/audit-logs');
+export const getAuditLogs = () => api.get('/api/audit-logs');
 export const getComputationResults = () => API.get('/compute/results');
 
 // --- Stats (for dashboard) ---

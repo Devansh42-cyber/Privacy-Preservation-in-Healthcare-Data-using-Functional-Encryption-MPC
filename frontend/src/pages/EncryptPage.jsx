@@ -1,4 +1,3 @@
-
 import Papa from 'papaparse';
 import React, { useState } from 'react';
 import {
@@ -9,7 +8,7 @@ import {
   Alert,
   Badge,
   MonoValue,
-  Spinner
+  Spinner,
 } from '../components/UI';
 
 const DISEASES = [
@@ -18,11 +17,10 @@ const DISEASES = [
   'Hypertension',
   'Cardiac Disease',
   'Respiratory',
-  'Neurological'
+  'Neurological',
 ];
 
 export default function EncryptPage() {
-
   const [mode, setMode] = useState('single');
 
   const [form, setForm] = useState({
@@ -31,7 +29,7 @@ export default function EncryptPage() {
     gender: '0',
     disease: '0',
     blood_pressure: '',
-    risk_score: ''
+    risk_score: '',
   });
 
   const [file, setFile] = useState(null);
@@ -46,13 +44,11 @@ export default function EncryptPage() {
 
   const [error, setError] = useState('');
 
-
   // =====================================================
   // SINGLE ENCRYPT
   // =====================================================
 
   const handleSingleEncrypt = async () => {
-
     setError('');
 
     setResult(null);
@@ -61,12 +57,7 @@ export default function EncryptPage() {
     const bp = parseInt(form.blood_pressure);
     const rs = parseInt(form.risk_score);
 
-    if (
-      !form.patient_id ||
-      isNaN(age) ||
-      isNaN(bp) ||
-      isNaN(rs)
-    ) {
+    if (!form.patient_id || isNaN(age) || isNaN(bp) || isNaN(rs)) {
       setError('All fields are required.');
       return;
     }
@@ -74,26 +65,22 @@ export default function EncryptPage() {
     setEncrypting(true);
 
     try {
+      const response = await fetch('http://localhost:3000/api/encrypt', {
+        method: 'POST',
 
-      const response = await fetch(
-        'http://localhost:5000/api/encrypt',
-        {
-          method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
 
-          headers: {
-            'Content-Type': 'application/json'
-          },
-
-          body: JSON.stringify({
-            patient_id: form.patient_id,
-            age,
-            gender: parseInt(form.gender),
-            disease: parseInt(form.disease),
-            blood_pressure: bp,
-            risk_score: rs
-          })
-        }
-      );
+        body: JSON.stringify({
+          patient_id: form.patient_id,
+          age,
+          gender: parseInt(form.gender),
+          disease: parseInt(form.disease),
+          blood_pressure: bp,
+          risk_score: rs,
+        }),
+      });
 
       const data = await response.json();
 
@@ -111,19 +98,15 @@ export default function EncryptPage() {
           encrypted_age: data.encrypted_data.age,
           encrypted_gender: data.encrypted_data.gender,
           encrypted_disease: data.encrypted_data.disease,
-          encrypted_blood_pressure:
-            data.encrypted_data.blood_pressure,
-          encrypted_risk_score:
-            data.encrypted_data.risk_score,
+          encrypted_blood_pressure: data.encrypted_data.blood_pressure,
+          encrypted_risk_score: data.encrypted_data.risk_score,
         },
 
         timestamp: new Date().toISOString(),
 
-        stored: true
+        stored: true,
       });
-
     } catch (err) {
-
       console.error(err);
 
       setError('Backend connection failed');
@@ -132,13 +115,11 @@ export default function EncryptPage() {
     setEncrypting(false);
   };
 
-
   // =====================================================
   // FILE SELECT + CSV PARSE
   // =====================================================
 
   const handleFileSelect = (e) => {
-
     const f = e.target.files[0];
 
     if (!f) return;
@@ -150,25 +131,23 @@ export default function EncryptPage() {
     setError('');
 
     Papa.parse(f, {
-
       header: true,
 
       skipEmptyLines: true,
 
       complete: (results) => {
-
         console.log('RAW CSV:', results.data);
 
         const cleaned = results.data
-          .map(row => ({
+          .map((row) => ({
             patient_id: row.patient_id?.trim(),
             age: row.age,
             gender: row.gender,
             disease: row.disease,
             blood_pressure: row.blood_pressure,
-            risk_score: row.risk_score
+            risk_score: row.risk_score,
           }))
-          .filter(row => row.patient_id);
+          .filter((row) => row.patient_id);
 
         console.log('CLEANED CSV:', cleaned);
 
@@ -178,21 +157,18 @@ export default function EncryptPage() {
       },
 
       error: (err) => {
-
         console.error(err);
 
         setError('CSV parsing failed');
-      }
+      },
     });
   };
-
 
   // =====================================================
   // BATCH ENCRYPT
   // =====================================================
 
   const handleBatchEncrypt = async () => {
-
     console.log('CSV DATA:', csvData);
 
     if (!csvData.length) {
@@ -201,7 +177,6 @@ export default function EncryptPage() {
     }
 
     try {
-
       setEncrypting(true);
 
       let successCount = 0;
@@ -209,101 +184,77 @@ export default function EncryptPage() {
       const sampleRecords = [];
 
       for (const row of csvData) {
-
         try {
+          const response = await fetch('http://localhost:3000/api/encrypt', {
+            method: 'POST',
 
-          const response = await fetch(
-            'http://localhost:5000/api/encrypt',
-            {
-              method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
 
-              headers: {
-                'Content-Type': 'application/json'
-              },
-
-              body: JSON.stringify({
-                patient_id: row.patient_id,
-                age: Number(row.age),
-                gender: Number(row.gender),
-                disease: Number(row.disease),
-                blood_pressure:
-                  Number(row.blood_pressure),
-                risk_score:
-                  Number(row.risk_score),
-              })
-            }
-          );
+            body: JSON.stringify({
+              patient_id: row.patient_id,
+              age: Number(row.age),
+              gender: Number(row.gender),
+              disease: Number(row.disease),
+              blood_pressure: Number(row.blood_pressure),
+              risk_score: Number(row.risk_score),
+            }),
+          });
 
           const data = await response.json();
 
           console.log(data);
 
           if (data.success) {
-
             successCount++;
 
             if (sampleRecords.length < 5) {
-
               sampleRecords.push({
                 id: data.record_id,
-                patient: row.patient_id
+                patient: row.patient_id,
               });
             }
           }
-
         } catch (err) {
-
-          console.error(
-            'Batch row failed:',
-            err
-          );
+          console.error('Batch row failed:', err);
         }
       }
 
       setBatchResults({
         count: successCount,
-        records: sampleRecords
+        records: sampleRecords,
       });
 
-      alert(
-        `${successCount} records encrypted successfully`
-      );
-
+      alert(`${successCount} records encrypted successfully`);
     } catch (err) {
-
       console.error(err);
 
       alert('Batch upload failed');
-
     } finally {
-
       setEncrypting(false);
     }
   };
-
 
   // =====================================================
   // UI
   // =====================================================
 
   return (
-
     <div
       style={{
         padding: '28px 32px',
         maxWidth: 900,
-        margin: '0 auto'
+        margin: '0 auto',
       }}
     >
-
       <div style={{ marginBottom: 28 }}>
-
         <h1
           style={{
             fontFamily: 'var(--font-display)',
             fontWeight: 700,
             fontSize: 22,
-            marginBottom: 4
+            marginBottom: 4,
           }}
         >
           Encrypt Healthcare Data
@@ -312,14 +263,12 @@ export default function EncryptPage() {
         <p
           style={{
             fontSize: 12,
-            color: 'var(--text-secondary)'
+            color: 'var(--text-secondary)',
           }}
         >
-          Encrypt patient records using
-          Functional Encryption.
+          Encrypt patient records using Functional Encryption.
         </p>
       </div>
-
 
       {/* TOGGLE */}
 
@@ -327,31 +276,24 @@ export default function EncryptPage() {
         style={{
           display: 'flex',
           gap: 8,
-          marginBottom: 24
+          marginBottom: 24,
         }}
       >
-
-        {['single', 'batch'].map(m => (
-
+        {['single', 'batch'].map((m) => (
           <button
             key={m}
-
             onClick={() => {
               setMode(m);
               setResult(null);
               setBatchResults(null);
               setError('');
             }}
-
             style={{
               padding: '8px 20px',
               borderRadius: 8,
               cursor: 'pointer',
 
-              background:
-                mode === m
-                  ? 'rgba(32,200,160,0.15)'
-                  : 'transparent',
+              background: mode === m ? 'rgba(32,200,160,0.15)' : 'transparent',
 
               border:
                 mode === m
@@ -359,17 +301,13 @@ export default function EncryptPage() {
                   : '1px solid var(--border-default)',
 
               color:
-                mode === m
-                  ? 'var(--accent-primary)'
-                  : 'var(--text-secondary)',
+                mode === m ? 'var(--accent-primary)' : 'var(--text-secondary)',
 
               fontFamily: 'var(--font-mono)',
               fontSize: 12,
             }}
           >
-            {m === 'single'
-              ? 'SINGLE RECORD'
-              : 'BATCH UPLOAD'}
+            {m === 'single' ? 'SINGLE RECORD' : 'BATCH UPLOAD'}
           </button>
         ))}
       </div>
@@ -377,327 +315,225 @@ export default function EncryptPage() {
       {/* SINGLE MODE */}
       {/* SINGLE MODE */}
 
-{mode === 'single' && (
-
-  <Card>
-
-    <div
-      style={{
-        display: 'grid',
-        gap: 18
-      }}
-    >
-
-      <Input
-        label="PATIENT ID"
-        placeholder="e.g. P1042"
-        value={form.patient_id}
-        onChange={(e) =>
-          setForm({
-            ...form,
-            patient_id:
-              e.target.value
-          })
-        }
-      />
-
-
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns:
-            '1fr 1fr',
-          gap: 16
-        }}
-      >
-
-        <Input
-          label="AGE"
-          placeholder="18-90"
-          value={form.age}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              age: e.target.value
-            })
-          }
-        />
-
-
-
-        <div>
-
+      {mode === 'single' && (
+        <Card>
           <div
             style={{
-              fontSize: 11,
-              marginBottom: 6,
-              color:
-                'var(--text-muted)',
-              fontFamily:
-                'var(--font-mono)'
+              display: 'grid',
+              gap: 18,
             }}
           >
-            GENDER
+            <Input
+              label="PATIENT ID"
+              placeholder="e.g. P1042"
+              value={form.patient_id}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  patient_id: e.target.value,
+                })
+              }
+            />
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 16,
+              }}
+            >
+              <Input
+                label="AGE"
+                placeholder="18-90"
+                value={form.age}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    age: e.target.value,
+                  })
+                }
+              />
+
+              <div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    marginBottom: 6,
+                    color: 'var(--text-muted)',
+                    fontFamily: 'var(--font-mono)',
+                  }}
+                >
+                  GENDER
+                </div>
+
+                <select
+                  value={form.gender}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      gender: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    borderRadius: 10,
+                    background: '#071426',
+                    border: '1px solid rgba(32,200,160,0.2)',
+                    color: 'white',
+                  }}
+                >
+                  <option value="0">Male (0)</option>
+
+                  <option value="1">Female (1)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <div
+                style={{
+                  fontSize: 11,
+                  marginBottom: 6,
+                  color: 'var(--text-muted)',
+                  fontFamily: 'var(--font-mono)',
+                }}
+              >
+                DISEASE TYPE
+              </div>
+
+              <select
+                value={form.disease}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    disease: e.target.value,
+                  })
+                }
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  borderRadius: 10,
+                  background: '#071426',
+                  border: '1px solid rgba(32,200,160,0.2)',
+                  color: 'white',
+                }}
+              >
+                <option value="0">None (0)</option>
+
+                <option value="1">Diabetes (1)</option>
+
+                <option value="2">Hypertension (2)</option>
+
+                <option value="3">Cardiac Disease (3)</option>
+
+                <option value="4">Respiratory (4)</option>
+
+                <option value="5">Neurological (5)</option>
+              </select>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 16,
+              }}
+            >
+              <Input
+                label="BLOOD PRESSURE (MMHG)"
+                placeholder="90-160"
+                value={form.blood_pressure}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    blood_pressure: e.target.value,
+                  })
+                }
+              />
+
+              <Input
+                label="RISK SCORE (1-100)"
+                placeholder="1-100"
+                value={form.risk_score}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    risk_score: e.target.value,
+                  })
+                }
+              />
+            </div>
+
+            {error && <Alert type="error">{error}</Alert>}
+
+            <Button
+              onClick={handleSingleEncrypt}
+              disabled={encrypting}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+              }}
+            >
+              {encrypting ? 'Encrypting...' : '⊕ Encrypt & Store Record'}
+            </Button>
+
+            {result && (
+              <div
+                style={{
+                  marginTop: 20,
+                  padding: 16,
+                  borderRadius: 10,
+                  background: 'rgba(32,200,160,0.08)',
+                  border: '1px solid rgba(32,200,160,0.25)',
+                }}
+              >
+                <div
+                  style={{
+                    color: 'var(--accent-primary)',
+                    fontWeight: 600,
+                    marginBottom: 10,
+                  }}
+                >
+                  Record encrypted successfully
+                </div>
+
+                <MonoValue>{result.record_id}</MonoValue>
+              </div>
+            )}
           </div>
-
-          <select
-            value={form.gender}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                gender:
-                  e.target.value
-              })
-            }
-
-            style={{
-              width: '100%',
-              padding: '14px',
-              borderRadius: 10,
-              background: '#071426',
-              border:
-                '1px solid rgba(32,200,160,0.2)',
-              color: 'white'
-            }}
-          >
-
-            <option value="0">
-              Male (0)
-            </option>
-
-            <option value="1">
-              Female (1)
-            </option>
-
-          </select>
-
-        </div>
-
-      </div>
-
-
-
-      <div>
-
-        <div
-          style={{
-            fontSize: 11,
-            marginBottom: 6,
-            color:
-              'var(--text-muted)',
-            fontFamily:
-              'var(--font-mono)'
-          }}
-        >
-          DISEASE TYPE
-        </div>
-
-        <select
-          value={form.disease}
-
-          onChange={(e) =>
-            setForm({
-              ...form,
-              disease:
-                e.target.value
-            })
-          }
-
-          style={{
-            width: '100%',
-            padding: '14px',
-            borderRadius: 10,
-            background: '#071426',
-            border:
-              '1px solid rgba(32,200,160,0.2)',
-            color: 'white'
-          }}
-        >
-
-          <option value="0">
-            None (0)
-          </option>
-
-          <option value="1">
-            Diabetes (1)
-          </option>
-
-          <option value="2">
-            Hypertension (2)
-          </option>
-
-          <option value="3">
-            Cardiac Disease (3)
-          </option>
-
-          <option value="4">
-            Respiratory (4)
-          </option>
-
-          <option value="5">
-            Neurological (5)
-          </option>
-
-        </select>
-
-      </div>
-
-
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns:
-            '1fr 1fr',
-          gap: 16
-        }}
-      >
-
-        <Input
-          label="BLOOD PRESSURE (MMHG)"
-          placeholder="90-160"
-          value={form.blood_pressure}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              blood_pressure:
-                e.target.value
-            })
-          }
-        />
-
-
-
-        <Input
-          label="RISK SCORE (1-100)"
-          placeholder="1-100"
-          value={form.risk_score}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              risk_score:
-                e.target.value
-            })
-          }
-        />
-
-      </div>
-
-
-
-      {error && (
-        <Alert type="error">
-          {error}
-        </Alert>
+        </Card>
       )}
-
-
-
-      <Button
-        onClick={
-          handleSingleEncrypt
-        }
-
-        disabled={encrypting}
-
-        style={{
-          width: '100%',
-          justifyContent:
-            'center'
-        }}
-      >
-
-        {encrypting
-          ? 'Encrypting...'
-          : '⊕ Encrypt & Store Record'}
-
-      </Button>
-
-
-
-      {result && (
-
-        <div
-          style={{
-            marginTop: 20,
-            padding: 16,
-            borderRadius: 10,
-            background:
-              'rgba(32,200,160,0.08)',
-            border:
-              '1px solid rgba(32,200,160,0.25)'
-          }}
-        >
-
-          <div
-            style={{
-              color:
-                'var(--accent-primary)',
-              fontWeight: 600,
-              marginBottom: 10
-            }}
-          >
-            Record encrypted successfully
-          </div>
-
-          <MonoValue>
-            {result.record_id}
-          </MonoValue>
-
-        </div>
-
-      )}
-
-    </div>
-
-  </Card>
-
-)}
       {/* BATCH MODE */}
 
       {mode === 'batch' && (
-
         <Card>
-
           <div
             style={{
               fontSize: 11,
               fontFamily: 'var(--font-mono)',
               color: 'var(--text-muted)',
-              marginBottom: 20
+              marginBottom: 20,
             }}
           >
             BATCH CSV UPLOAD
           </div>
 
-
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleFileSelect}
-          />
-
+          <input type="file" accept=".csv" onChange={handleFileSelect} />
 
           {file && (
             <div
               style={{
                 marginTop: 10,
                 marginBottom: 10,
-                color: 'var(--text-secondary)'
+                color: 'var(--text-secondary)',
               }}
             >
               {file.name}
             </div>
           )}
 
-
-          {error && (
-            <Alert type="error">
-              {error}
-            </Alert>
-          )}
-
+          {error && <Alert type="error">{error}</Alert>}
 
           <Button
             onClick={handleBatchEncrypt}
@@ -705,27 +541,19 @@ export default function EncryptPage() {
             style={{
               marginTop: 14,
               width: '100%',
-              justifyContent: 'center'
+              justifyContent: 'center',
             }}
           >
-
-            {encrypting
-              ? 'Processing...'
-              : '⊕ Encrypt All Records'}
-
+            {encrypting ? 'Processing...' : '⊕ Encrypt All Records'}
           </Button>
 
-
           {batchResults && (
-
             <div style={{ marginTop: 24 }}>
-
               <div
                 style={{
                   fontSize: 34,
                   fontWeight: 700,
-                  color:
-                    'var(--accent-primary)'
+                  color: 'var(--accent-primary)',
                 }}
               >
                 {batchResults.count}
@@ -734,38 +562,27 @@ export default function EncryptPage() {
               <div
                 style={{
                   color: 'var(--text-muted)',
-                  marginBottom: 16
+                  marginBottom: 16,
                 }}
               >
                 records encrypted and stored
               </div>
 
-
-              {(batchResults.records || [])
-                .map((r, i) => (
-
+              {(batchResults.records || []).map((r, i) => (
                 <div
                   key={i}
                   style={{
                     display: 'flex',
-                    justifyContent:
-                      'space-between',
+                    justifyContent: 'space-between',
                     padding: '8px 10px',
-                    background:
-                      'var(--bg-elevated)',
+                    background: 'var(--bg-elevated)',
                     borderRadius: 6,
-                    marginBottom: 6
+                    marginBottom: 6,
                   }}
                 >
+                  <MonoValue>{r.id}</MonoValue>
 
-                  <MonoValue>
-                    {r.id}
-                  </MonoValue>
-
-                  <span>
-                    {r.patient}
-                  </span>
-
+                  <span>{r.patient}</span>
                 </div>
               ))}
             </div>

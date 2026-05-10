@@ -1,35 +1,29 @@
 const mongoose = require('mongoose');
 
 const AuditLogSchema = new mongoose.Schema({
-
   action: {
     type: String,
-    required: true
+    required: true,
   },
 
   user: {
     type: String,
-    default: 'system'
+    default: 'system',
   },
 
   details: {
-    type: String
+    type: String,
   },
 
   status: {
     type: String,
-    default: 'success'
+    default: 'success',
   },
 
   timestamp: {
     type: Date,
-    default: Date.now
-  }
-
+    default: Date.now,
+  },
 });
 
-module.exports =
-  mongoose.model(
-    'AuditLog',
-    AuditLogSchema
-  );
+module.exports = mongoose.model('AuditLog', AuditLogSchema);
