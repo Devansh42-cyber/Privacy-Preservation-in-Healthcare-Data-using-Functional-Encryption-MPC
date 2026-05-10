@@ -46,91 +46,72 @@ export default function MPCPage() {
     }
 
     const totalRecords = selected.reduce((acc, id) => acc + (INSTITUTIONS.find(i => i.id === id)?.records || 0), 0);
-    setResult({
-      sessionId: sid,
-      parties: selected.length,
-      totalRecords,
-      function: fnType,
-      aggregateResult:
+    const response = await fetch(
 
-  fnType === 'sum_disease_count'
-
-    ? {
-
-        diabetes:
-          Math.floor(
-            totalRecords * 0.21
-          ),
-
-        hypertension:
-          Math.floor(
-            totalRecords * 0.16
-          ),
-
-        cardiac:
-          Math.floor(
-            totalRecords * 0.11
-          ),
-
-      }
-
-    : fnType === 'average_age'
-
-      ? {
-
-          average:
-            (
-              42 +
-              selected.length * 3 +
-              Math.random() * 8
-            ).toFixed(1),
-
-          std_dev:
-            (
-              10 +
-              Math.random() * 8
-            ).toFixed(1),
-
-        }
-
-      : {
-
-          average_risk:
-            (
-              50 +
-              selected.length * 4 +
-              Math.random() * 12
-            ).toFixed(1),
-
-          high_risk_count:
-            Math.floor(
-              totalRecords * 0.34
-            ),
-
-        },
-      threshold: parseInt(threshold),
-      timestamp: new Date().toISOString(),
-    });
-    setHistory(prev => [
+  'http://localhost:5000/api/mpc/initiate',
 
   {
-    id: sid,
 
-    function: fnType,
+    method: 'POST',
 
-    parties: selected.length,
+    headers: {
 
-    records: totalRecords,
+      'Content-Type':
+        'application/json'
+    },
+
+    body: JSON.stringify({
+
+      institutions:
+        selected,
+
+      function_type:
+        fnType,
+
+      threshold
+    })
+  }
+);
+
+const data =
+  await response.json();
+  console.log(data);
+
+if (data.success) {
+
+  setResult({
+
+    sessionId:
+      data.session_id,
+
+    parties:
+      selected.length,
+
+    totalRecords:
+      data.total_records ||
+
+      0,
+
+    function:
+      fnType,
+
+    aggregateResult:
+      data.aggregateResult || {},
+
+    threshold,
 
     timestamp:
-      new Date().toLocaleString(),
+      data.timestamp
+  });
 
-    status: 'COMPLETED'
-  },
+} else {
 
-  ...prev
+  console.error(data);
 
-]);
+  alert(
+    'MPC computation failed'
+  );
+}
     setRunning(false);
     setStepIdx(STEPS_TEMPLATE.length);
   };
@@ -290,7 +271,9 @@ export default function MPCPage() {
 
               <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginBottom: 8 }}>AGGREGATE RESULT</div>
               <div style={{ background: 'var(--bg-surface)', borderRadius: 8, padding: '12px 14px', marginBottom: 12, fontFamily: 'var(--font-mono)', fontSize: 12 }}>
-                {Object.entries(result.aggregateResult).map(([k, v]) => (
+                {Object.entries(
+  result.aggregateResult || {}
+).map(([k, v]) => (
                   <div key={k} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                     <span style={{ color: 'var(--text-muted)' }}>{k}:</span>
                     <span style={{ color: 'var(--accent-primary)' }}>{v}</span>

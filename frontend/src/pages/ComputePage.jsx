@@ -4,8 +4,8 @@ import { Card, Button, Select, Alert, Badge, MonoValue, Spinner, Input } from '.
 const FUNCTIONS = [
   { value: 'average_age', label: 'Average Age', desc: 'Compute mean age across encrypted records', icon: '∑', vector: '[1,0,0,0,0]' },
   { value: 'disease_frequency', label: 'Disease Frequency', desc: 'Count occurrences of each disease type', icon: '⊞', vector: '[0,0,1,0,0]' },
-  { value: 'average_risk_score', label: 'Avg Risk Score', desc: 'Statistical risk score distribution', icon: '◈', vector: '[0,0,0,0,1]' },
-  { value: 'blood_pressure_avg', label: 'Avg Blood Pressure', desc: 'Mean blood pressure across population', icon: '♥', vector: '[0,0,0,1,0]' },
+  { value: 'avg_risk_score', label: 'Avg Risk Score', desc: 'Statistical risk score distribution', icon: '◈', vector: '[0,0,0,0,1]' },
+  { value: 'avg_blood_pressure', label: 'Avg Blood Pressure', desc: 'Mean blood pressure across population', icon: '♥', vector: '[0,0,0,1,0]' },
   { value: 'risk_score_by_disease', label: 'Risk by Disease', desc: 'Average risk score per disease group', icon: '⊟', vector: '[0,0,1,0,1]' },
 ];
 
@@ -265,7 +265,7 @@ export default function ComputePage() {
                 <span style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: '#20c8a0' }}>COMPUTATION RESULT</span>
               </div>
 
-              {result.value !== null ? (
+              {result.value !== undefined ? (
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: 44, fontWeight: 700, color: 'var(--accent-primary)', marginBottom: 2 }}>
                     {result.value}
@@ -286,8 +286,13 @@ export default function ComputePage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
                   {(result.breakdown || []).map((b, i) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', background: 'var(--bg-elevated)', borderRadius: 6 }}>
-                      <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{b.name}</span>
-                      <MonoValue>{b.count || b.avg}</MonoValue>
+                      <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+  {b.name || b.disease}
+</span>
+
+<MonoValue>
+  {b.count || b.average_risk}
+</MonoValue>
                     </div>
                   ))}
                 </div>

@@ -29,13 +29,7 @@ const computeData = [
   { name: 'bp_avg', count: 15 },
 ];
 
-const diseaseData = [
-  { name: 'Diabetes', value: 32, color: '#20c8a0' },
-  { name: 'Hypertension', value: 27, color: '#0ea5e9' },
-  { name: 'Cardiac', value: 18, color: '#8b5cf6' },
-  { name: 'Respiratory', value: 13, color: '#f59e0b' },
-  { name: 'Other', value: 10, color: '#4d6660' },
-];
+
 
 
 
@@ -47,6 +41,16 @@ const TYPE_COLORS = {
   KEYGEN: '#f59e0b',
 
 };
+const PIE_COLORS = [
+
+  '#20c8a0',
+  '#0ea5e9',
+  '#8b5cf6',
+  '#f59e0b',
+  '#ef4444',
+  '#14b8a6',
+  '#f97316'
+];
 
 
 // ============================================
@@ -121,10 +125,13 @@ export default function DashboardPage() {
 
   const [analytics, setAnalytics] = useState({
 
-    encryptionData: [],
-    recentActivity: []
+  encryptionData: [],
 
-  });
+  diseaseDistribution: [],
+
+  recentActivity: []
+
+});
 
 
 
@@ -504,7 +511,7 @@ export default function DashboardPage() {
     <PieChart>
 
       <Pie
-        data={diseaseData}
+        data={analytics.diseaseDistribution}
         cx="50%"
         cy="50%"
         innerRadius={40}
@@ -513,11 +520,15 @@ export default function DashboardPage() {
         dataKey="value"
       >
 
-        {diseaseData.map((entry, i) => (
+        {analytics.diseaseDistribution.map((entry, i) => (
 
           <Cell
             key={i}
-            fill={entry.color}
+            fill={
+  PIE_COLORS[
+    i % PIE_COLORS.length
+  ]
+}
           />
 
         ))}
@@ -540,7 +551,7 @@ export default function DashboardPage() {
     }}
   >
 
-    {diseaseData.map(d => (
+    {analytics.diseaseDistribution.map((d, i) => (
 
       <div
         key={d.name}
@@ -556,7 +567,10 @@ export default function DashboardPage() {
             width: 6,
             height: 6,
             borderRadius: '50%',
-            background: d.color
+            background:
+  PIE_COLORS[
+    i % PIE_COLORS.length
+  ]
           }}
         />
 
