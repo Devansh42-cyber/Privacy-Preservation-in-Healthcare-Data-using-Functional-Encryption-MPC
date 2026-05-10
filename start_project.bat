@@ -4,13 +4,25 @@ echo ======================================
 echo STARTING PRIVACY PRESERVATION PROJECT
 echo ======================================
 
+:: ======================================
+:: START BACKEND
+:: ======================================
+
 start cmd /k "cd backend && node server.js"
 
 timeout /t 2 > nul
 
+:: ======================================
+:: START FLASK CRYPTO API
+:: ======================================
+
 start cmd /k "py crypto_api.py"
 
 timeout /t 2 > nul
+
+:: ======================================
+:: START FRONTEND
+:: ======================================
 
 start cmd /k "cd frontend && npm run dev"
 

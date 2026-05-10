@@ -1,7 +1,7 @@
 import csv
 import random
 
-NUM_RECORDS = 10000
+NUM_RECORDS = 100
 
 genders = [0, 1]
 
@@ -25,17 +25,11 @@ with open(output_file, mode="w", newline="") as file:
 
 
     for i in range(NUM_RECORDS):
-
         patient_id = f"P{1000 + i}"
-
         age = random.randint(18, 100)
-
         gender = random.choice(genders)
-
         disease = random.choice(diseases)
-
         blood_pressure = random.randint(60, 160)
-
         risk_score = random.randint(1, 100)
 
         writer.writerow([

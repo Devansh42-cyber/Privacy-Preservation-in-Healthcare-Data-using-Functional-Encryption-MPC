@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-
 const multer = require('multer');
 const csv = require('csv-parser');
 const fs = require('fs');
@@ -32,14 +31,6 @@ app.use(
 );
 
 app.use(express.json());
-
-// =====================================================
-// FILE UPLOAD
-// =====================================================
-
-const upload = multer({
-  dest: 'uploads/',
-});
 
 // =====================================================
 // MONGODB SCHEMAS
@@ -113,18 +104,6 @@ const ComputationResult = mongoose.model(
 function generateRecordId() {
   return `REC_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
 }
-
-// =====================================================
-// HEALTH ROUTE
-// =====================================================
-
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-
-    timestamp: new Date().toISOString(),
-  });
-});
 
 // =====================================================
 // ENCRYPT ROUTE
@@ -376,7 +355,6 @@ app.post(
 
                 failed,
               },
-
               errors,
             });
           } catch (processingError) {
@@ -574,7 +552,7 @@ app.get(
 
 app.get('/api/audit-logs', async (req, res) => {
   try {
-    const logs = await AuditLog.find().sort({ timestamp: -1 }).limit(20);
+    const logs = await AuditLog.find().sort({ timestamp: -1 }).limit(500);
 
     res.json({
       success: true,
@@ -600,33 +578,148 @@ app.post('/api/compute', async (req, res) => {
   try {
     const { function_type } = req.body;
 
+    const records = await EncryptedPatientData.find();
+    // =====================================
+    // DECRYPT ALL RECORDS
+    // =====================================
+
+    const decryptedRecords = [];
+
+    for (const r of records) {
+      const response = await axios.post('http://127.0.0.1:5001/decrypt', {
+        encrypted_age: r.encrypted_age,
+
+        encrypted_gender: r.encrypted_gender,
+
+        encrypted_disease: r.encrypted_disease,
+
+        encrypted_blood_pressure: r.encrypted_blood_pressure,
+
+        encrypted_risk_score: r.encrypted_risk_score,
+      });
+
+      decryptedRecords.push(response.data.decrypted_data);
+    }
+
     let result = {};
 
+    // =====================================
+    // AVERAGE AGE
+    // =====================================
+
     if (function_type === 'average_age') {
+      const ages = decryptedRecords
+        .map((r) => Number(r.age))
+        .filter((n) => !isNaN(n));
+
+      const avgAge = ages.reduce((a, b) => a + b, 0) / ages.length;
+
       result = {
-        value: 52.3,
+        value: avgAge.toFixed(1),
 
         unit: 'years',
-      };
-    } else if (function_type === 'disease_frequency') {
-      const diseaseData = await EncryptedPatientData.aggregate([
-        {
-          $group: {
-            _id: '$disease_category',
 
-            count: { $sum: 1 },
-          },
-        },
-      ]);
+        based_on: ages.length,
+      };
+    }
+
+    // =====================================
+    // DISEASE FREQUENCY
+    // =====================================
+    else if (function_type === 'disease_frequency') {
+      const diseaseMap = {};
+
+      decryptedRecords.forEach((r) => {
+        const disease = r.disease || 'Unknown';
+
+        diseaseMap[disease] = (diseaseMap[disease] || 0) + 1;
+      });
 
       result = {
-        breakdown: diseaseData.map((d) => ({
-          name: d._id,
+        breakdown: Object.keys(diseaseMap).map((key) => ({
+          name: key,
 
-          count: d.count,
+          count: diseaseMap[key],
         })),
       };
     }
+
+    // =====================================
+    // AVG RISK SCORE
+    // =====================================
+    else if (function_type === 'avg_risk_score') {
+      const risks = decryptedRecords
+        .map((r) => Number(r.risk_score))
+        .filter((n) => !isNaN(n));
+
+      const avgRisk = risks.reduce((a, b) => a + b, 0) / risks.length;
+
+      result = {
+        value: avgRisk.toFixed(1),
+
+        scale: '1-100',
+
+        based_on: risks.length,
+      };
+    }
+
+    // =====================================
+    // AVG BLOOD PRESSURE
+    // =====================================
+    else if (function_type === 'avg_blood_pressure') {
+      const bpValues = decryptedRecords
+        .map((r) => Number(r.blood_pressure))
+        .filter((n) => !isNaN(n));
+
+      const avgBP = bpValues.reduce((a, b) => a + b, 0) / bpValues.length;
+
+      result = {
+        value: avgBP.toFixed(1),
+
+        unit: 'mmHg',
+
+        based_on: bpValues.length,
+      };
+    }
+
+    // =====================================
+    // RISK SCORE BY DISEASE
+    // =====================================
+    else if (function_type === 'risk_score_by_disease') {
+      const diseaseRiskMap = {};
+
+      decryptedRecords.forEach((r) => {
+        const disease = r.disease || 'Unknown';
+
+        const risk = Number(r.risk_score);
+
+        if (!isNaN(risk)) {
+          if (!diseaseRiskMap[disease]) {
+            diseaseRiskMap[disease] = [];
+          }
+
+          diseaseRiskMap[disease].push(risk);
+        }
+      });
+
+      result = {
+        breakdown: Object.keys(diseaseRiskMap).map((disease) => {
+          const arr = diseaseRiskMap[disease];
+
+          const avg = arr.reduce((a, b) => a + b, 0) / arr.length;
+
+          return {
+            disease,
+
+            average_risk: avg.toFixed(1),
+          };
+        }),
+      };
+    }
+
+    // =====================================
+    // SAVE RESULT
+    // =====================================
 
     const computation = new ComputationResult({
       result_id: `COMP_${Date.now()}`,
@@ -638,6 +731,10 @@ app.post('/api/compute', async (req, res) => {
 
     await computation.save();
 
+    // =====================================
+    // AUDIT LOG
+    // =====================================
+
     await AuditLog.create({
       action: 'COMPUTE',
 
@@ -647,6 +744,10 @@ app.post('/api/compute', async (req, res) => {
 
       status: 'success',
     });
+
+    // =====================================
+    // RESPONSE
+    // =====================================
 
     res.json({
       success: true,
@@ -701,7 +802,132 @@ app.post(
     try {
       const { institutions, function_type, threshold = 2 } = req.body;
 
+      // =====================================
+      // FETCH RECORDS
+      // =====================================
+
+      const records = await EncryptedPatientData.find();
+      // =====================================
+      // VIRTUAL INSTITUTION RECORD SPLIT
+      // =====================================
+
+      const institutionBuckets = {
+        inst_A: [],
+        inst_B: [],
+        inst_C: [],
+      };
+
+      // distribute records across institutions
+
+      records.forEach((record, index) => {
+        if (index % 3 === 0) {
+          institutionBuckets.inst_A.push(record);
+        } else if (index % 3 === 1) {
+          institutionBuckets.inst_B.push(record);
+        } else {
+          institutionBuckets.inst_C.push(record);
+        }
+      });
+      // =====================================
+      // PARTICIPATING RECORDS
+      // =====================================
+
+      let participatingRecords = [];
+
+      institutions.forEach((id) => {
+        participatingRecords = [
+          ...participatingRecords,
+
+          ...(institutionBuckets[id] || []),
+        ];
+      });
+      // =====================================
+      // DECRYPT RECORDS
+      // =====================================
+
+      const decryptedRecords = [];
+
+      for (const r of participatingRecords) {
+        const response = await axios.post('http://127.0.0.1:5001/decrypt', {
+          encrypted_age: r.encrypted_age,
+
+          encrypted_gender: r.encrypted_gender,
+
+          encrypted_disease: r.encrypted_disease,
+
+          encrypted_blood_pressure: r.encrypted_blood_pressure,
+
+          encrypted_risk_score: r.encrypted_risk_score,
+        });
+
+        decryptedRecords.push(response.data.decrypted_data);
+      }
+
+      // =====================================
+      // COMPUTE REAL RESULT
+      // =====================================
+
+      let aggregateResult = {};
+
+      // =====================================
+      // DISEASE COUNT
+      // =====================================
+
+      if (function_type === 'sum_disease_count') {
+        const diseaseMap = {};
+
+        decryptedRecords.forEach((r) => {
+          const disease = r.disease || 'Unknown';
+
+          diseaseMap[disease] = (diseaseMap[disease] || 0) + 1;
+        });
+
+        aggregateResult = diseaseMap;
+      }
+
+      // =====================================
+      // AVERAGE AGE
+      // =====================================
+      else if (function_type === 'average_age') {
+        const ages = decryptedRecords
+          .map((r) => Number(r.age))
+          .filter((n) => !isNaN(n));
+
+        const avg = ages.reduce((a, b) => a + b, 0) / ages.length;
+
+        aggregateResult = {
+          average: avg.toFixed(1),
+
+          total_records: ages.length,
+        };
+      }
+
+      // =====================================
+      // AVERAGE RISK
+      // =====================================
+      else if (function_type === 'average_risk') {
+        const risks = decryptedRecords
+          .map((r) => Number(r.risk_score))
+          .filter((n) => !isNaN(n));
+
+        const avg = risks.reduce((a, b) => a + b, 0) / risks.length;
+
+        aggregateResult = {
+          average_risk: avg.toFixed(1),
+
+          high_risk_count: risks.filter((r) => r > 70).length,
+        };
+      }
+
+      // =====================================
+      // SESSION ID
+      // =====================================
+
       const session_id = `MPC_${Date.now()}`;
+
+      // =====================================
+      // AUDIT
+      // =====================================
 
       await AuditLog.create({
         action: 'MPC',
@@ -713,13 +939,22 @@ app.post(
         status: 'success',
       });
 
+      // =====================================
+      // RESPONSE
+      // =====================================
+
       res.json({
         success: true,
         session_id,
         institutions,
         function_type,
         threshold,
-        status: 'initiated',
+
+        total_records: decryptedRecords.length,
+
+        aggregateResult,
+
+        timestamp: new Date().toISOString(),
       });
     } catch (err) {
       console.error(err);
