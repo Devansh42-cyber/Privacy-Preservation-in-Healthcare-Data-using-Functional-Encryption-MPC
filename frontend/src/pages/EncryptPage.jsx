@@ -213,7 +213,7 @@ export default function EncryptPage() {
         try {
 
           const response = await fetch(
-            'http://localhost:3000/api/encrypt',
+            'http://localhost:5000/api/encrypt',
             {
               method: 'POST',
 
@@ -374,7 +374,286 @@ export default function EncryptPage() {
         ))}
       </div>
 
+      {/* SINGLE MODE */}
+      {/* SINGLE MODE */}
 
+{mode === 'single' && (
+
+  <Card>
+
+    <div
+      style={{
+        display: 'grid',
+        gap: 18
+      }}
+    >
+
+      <Input
+        label="PATIENT ID"
+        placeholder="e.g. P1042"
+        value={form.patient_id}
+        onChange={(e) =>
+          setForm({
+            ...form,
+            patient_id:
+              e.target.value
+          })
+        }
+      />
+
+
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            '1fr 1fr',
+          gap: 16
+        }}
+      >
+
+        <Input
+          label="AGE"
+          placeholder="18-90"
+          value={form.age}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              age: e.target.value
+            })
+          }
+        />
+
+
+
+        <div>
+
+          <div
+            style={{
+              fontSize: 11,
+              marginBottom: 6,
+              color:
+                'var(--text-muted)',
+              fontFamily:
+                'var(--font-mono)'
+            }}
+          >
+            GENDER
+          </div>
+
+          <select
+            value={form.gender}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                gender:
+                  e.target.value
+              })
+            }
+
+            style={{
+              width: '100%',
+              padding: '14px',
+              borderRadius: 10,
+              background: '#071426',
+              border:
+                '1px solid rgba(32,200,160,0.2)',
+              color: 'white'
+            }}
+          >
+
+            <option value="0">
+              Male (0)
+            </option>
+
+            <option value="1">
+              Female (1)
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+
+      <div>
+
+        <div
+          style={{
+            fontSize: 11,
+            marginBottom: 6,
+            color:
+              'var(--text-muted)',
+            fontFamily:
+              'var(--font-mono)'
+          }}
+        >
+          DISEASE TYPE
+        </div>
+
+        <select
+          value={form.disease}
+
+          onChange={(e) =>
+            setForm({
+              ...form,
+              disease:
+                e.target.value
+            })
+          }
+
+          style={{
+            width: '100%',
+            padding: '14px',
+            borderRadius: 10,
+            background: '#071426',
+            border:
+              '1px solid rgba(32,200,160,0.2)',
+            color: 'white'
+          }}
+        >
+
+          <option value="0">
+            None (0)
+          </option>
+
+          <option value="1">
+            Diabetes (1)
+          </option>
+
+          <option value="2">
+            Hypertension (2)
+          </option>
+
+          <option value="3">
+            Cardiac Disease (3)
+          </option>
+
+          <option value="4">
+            Respiratory (4)
+          </option>
+
+          <option value="5">
+            Neurological (5)
+          </option>
+
+        </select>
+
+      </div>
+
+
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            '1fr 1fr',
+          gap: 16
+        }}
+      >
+
+        <Input
+          label="BLOOD PRESSURE (MMHG)"
+          placeholder="90-160"
+          value={form.blood_pressure}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              blood_pressure:
+                e.target.value
+            })
+          }
+        />
+
+
+
+        <Input
+          label="RISK SCORE (1-100)"
+          placeholder="1-100"
+          value={form.risk_score}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              risk_score:
+                e.target.value
+            })
+          }
+        />
+
+      </div>
+
+
+
+      {error && (
+        <Alert type="error">
+          {error}
+        </Alert>
+      )}
+
+
+
+      <Button
+        onClick={
+          handleSingleEncrypt
+        }
+
+        disabled={encrypting}
+
+        style={{
+          width: '100%',
+          justifyContent:
+            'center'
+        }}
+      >
+
+        {encrypting
+          ? 'Encrypting...'
+          : '⊕ Encrypt & Store Record'}
+
+      </Button>
+
+
+
+      {result && (
+
+        <div
+          style={{
+            marginTop: 20,
+            padding: 16,
+            borderRadius: 10,
+            background:
+              'rgba(32,200,160,0.08)',
+            border:
+              '1px solid rgba(32,200,160,0.25)'
+          }}
+        >
+
+          <div
+            style={{
+              color:
+                'var(--accent-primary)',
+              fontWeight: 600,
+              marginBottom: 10
+            }}
+          >
+            Record encrypted successfully
+          </div>
+
+          <MonoValue>
+            {result.record_id}
+          </MonoValue>
+
+        </div>
+
+      )}
+
+    </div>
+
+  </Card>
+
+)}
       {/* BATCH MODE */}
 
       {mode === 'batch' && (

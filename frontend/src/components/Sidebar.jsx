@@ -53,13 +53,14 @@ export default function Sidebar() {
   return (
     <aside style={{
       width: collapsed ? 64 : 220,
-      minHeight: '100vh',
+      height: '100vh',
       background: 'var(--bg-base)',
       borderRight: '1px solid var(--border-subtle)',
       display: 'flex',
       flexDirection: 'column',
       transition: 'width 0.25s ease',
       overflow: 'hidden',
+      justifyContent: 'space-between',
       flexShrink: 0,
       position: 'relative',
       zIndex: 10,

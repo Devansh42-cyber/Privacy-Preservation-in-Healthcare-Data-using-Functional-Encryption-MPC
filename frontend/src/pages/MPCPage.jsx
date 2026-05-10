@@ -24,7 +24,8 @@ export default function MPCPage() {
   const [stepIdx, setStepIdx] = useState(-1);
   const [result, setResult] = useState(null);
   const [sessionId, setSessionId] = useState('');
-
+  const [history, setHistory] =
+  useState([]);
   const toggleInstitution = (id) => {
     if (INSTITUTIONS.find(i => i.id === id)?.status === 'offline') return;
     setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
@@ -50,14 +51,86 @@ export default function MPCPage() {
       parties: selected.length,
       totalRecords,
       function: fnType,
-      aggregateResult: fnType === 'sum_disease_count'
-        ? { diabetes: 1247, hypertension: 892, cardiac: 634 }
-        : fnType === 'average_age'
-          ? { average: 54.2, std_dev: 16.8 }
-          : { average_risk: 63.4, high_risk_count: 2108 },
+      aggregateResult:
+
+  fnType === 'sum_disease_count'
+
+    ? {
+
+        diabetes:
+          Math.floor(
+            totalRecords * 0.21
+          ),
+
+        hypertension:
+          Math.floor(
+            totalRecords * 0.16
+          ),
+
+        cardiac:
+          Math.floor(
+            totalRecords * 0.11
+          ),
+
+      }
+
+    : fnType === 'average_age'
+
+      ? {
+
+          average:
+            (
+              42 +
+              selected.length * 3 +
+              Math.random() * 8
+            ).toFixed(1),
+
+          std_dev:
+            (
+              10 +
+              Math.random() * 8
+            ).toFixed(1),
+
+        }
+
+      : {
+
+          average_risk:
+            (
+              50 +
+              selected.length * 4 +
+              Math.random() * 12
+            ).toFixed(1),
+
+          high_risk_count:
+            Math.floor(
+              totalRecords * 0.34
+            ),
+
+        },
       threshold: parseInt(threshold),
       timestamp: new Date().toISOString(),
     });
+    setHistory(prev => [
+
+  {
+    id: sid,
+
+    function: fnType,
+
+    parties: selected.length,
+
+    records: totalRecords,
+
+    timestamp:
+      new Date().toLocaleString(),
+
+    status: 'COMPLETED'
+  },
+
+  ...prev
+
+]);
     setRunning(false);
     setStepIdx(STEPS_TEMPLATE.length);
   };
@@ -195,6 +268,7 @@ export default function MPCPage() {
 
           {/* Result */}
           {result && (
+            
             <Card style={{ animation: 'fadeInUp 0.35s ease', borderColor: 'rgba(32,200,160,0.3)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
                 <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#20c8a0', boxShadow: '0 0 6px #20c8a0' }} />
@@ -222,6 +296,162 @@ export default function MPCPage() {
                     <span style={{ color: 'var(--accent-primary)' }}>{v}</span>
                   </div>
                 ))}
+              <Card
+  style={{
+    animation:
+      'fadeInUp 0.4s ease'
+  }}
+>
+
+  <div
+    style={{
+      fontSize: 11,
+
+      fontFamily:
+        'var(--font-mono)',
+
+      color:
+        'var(--text-muted)',
+
+      marginBottom: 16,
+
+      letterSpacing: '0.05em'
+    }}
+  >
+    RECENT MPC SESSIONS
+  </div>
+
+  {history.length === 0 ? (
+
+    <div
+      style={{
+        fontSize: 12,
+        color:
+          'var(--text-muted)'
+      }}
+    >
+      No completed MPC sessions yet.
+    </div>
+
+  ) : (
+
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10
+      }}
+    >
+
+      {history.map((item, idx) => (
+
+        <div
+          key={idx}
+
+          style={{
+            padding: '12px',
+
+            borderRadius: 10,
+
+            background:
+              'var(--bg-elevated)',
+
+            border:
+              '1px solid var(--border-subtle)'
+          }}
+        >
+
+          <div
+            style={{
+              display: 'flex',
+
+              justifyContent:
+                'space-between',
+
+              marginBottom: 8
+            }}
+          >
+
+            <div
+              style={{
+                fontSize: 12,
+
+                fontWeight: 600,
+
+                color:
+                  'var(--text-primary)'
+              }}
+            >
+              {item.id}
+            </div>
+
+            <div
+              style={{
+                fontSize: 10,
+
+                color: '#20c8a0',
+
+                fontFamily:
+                  'var(--font-mono)'
+              }}
+            >
+              {item.status}
+            </div>
+
+          </div>
+
+          <div
+            style={{
+              fontSize: 11,
+
+              color:
+                'var(--text-secondary)',
+
+              marginBottom: 4
+            }}
+          >
+            Function:
+            {' '}
+            {item.function}
+          </div>
+
+          <div
+            style={{
+              fontSize: 11,
+
+              color:
+                'var(--text-secondary)',
+
+              marginBottom: 4
+            }}
+          >
+            Parties:
+            {' '}
+            {item.parties}
+            {' '}·{' '}
+            Records:
+            {' '}
+            {item.records.toLocaleString()}
+          </div>
+
+          <div
+            style={{
+              fontSize: 10,
+
+              color:
+                'var(--text-muted)'
+            }}
+          >
+            {item.timestamp}
+          </div>
+
+        </div>
+      ))}
+
+    </div>
+  )}
+
+</Card>
               </div>
 
               <Alert type="success">Individual party data was never exposed. Only final aggregate reconstructed.</Alert>

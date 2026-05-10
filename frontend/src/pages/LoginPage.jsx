@@ -4,10 +4,41 @@ import { useAuth } from '../context/AuthContext';
 import { Input, Button, Alert } from '../components/UI';
 
 const DEMO_ACCOUNTS = [
-  { username: 'admin', password: 'admin123', role: 'Administrator', color: '#f59e0b' },
-  { username: 'dataowner', password: 'owner123', role: 'Data Owner', color: '#0ea5e9' },
-  { username: 'analyst', password: 'analyst123', role: 'Research Analyst', color: '#8b5cf6' },
-  { username: 'officer', password: 'officer123', role: 'Privacy Officer', color: '#20c8a0' },
+
+  {
+    username: 'admin',
+    password: 'Admin@2026Secure',
+    role: 'Administrator',
+    color: '#f59e0b'
+  },
+
+
+
+  {
+    username: 'owner',
+    password: 'Owner@2026Secure',
+    role: 'Data Owner',
+    color: '#0ea5e9'
+  },
+
+
+
+  {
+    username: 'analyst',
+    password: 'Analyst@2026Secure',
+    role: 'Research Analyst',
+    color: '#8b5cf6'
+  },
+
+
+
+  {
+    username: 'privacy',
+    password: 'Privacy@2026Secure',
+    role: 'Privacy Officer',
+    color: '#20c8a0'
+  },
+
 ];
 
 export default function LoginPage() {
@@ -35,7 +66,7 @@ export default function LoginPage() {
 
   return (
     <div style={{
-      minHeight: '100vh', background: 'var(--bg-void)',
+      minHeight: '100%', background: 'var(--bg-void)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       position: 'relative', overflow: 'hidden',
     }}>
