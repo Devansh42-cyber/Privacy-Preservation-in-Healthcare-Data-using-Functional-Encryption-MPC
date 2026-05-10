@@ -945,13 +945,9 @@ app.post(
 
       res.json({
         success: true,
-
         session_id,
-
         institutions,
-
         function_type,
-
         threshold,
 
         total_records: decryptedRecords.length,
