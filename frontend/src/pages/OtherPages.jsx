@@ -1,65 +1,47 @@
 import React from 'react';
 
 export function RecordsPage() {
-
   const [records, setRecords] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState('');
 
   React.useEffect(() => {
-
     fetchRecords();
-
   }, []);
 
   const fetchRecords = async () => {
-
     try {
-
-      const response = await fetch(
-        'http://localhost:5000/api/records'
-      );
+      const response = await fetch('http://localhost:3000/api/records');
 
       const data = await response.json();
 
       if (data.success) {
-
         setRecords(data.records);
-
       } else {
-
         setError('Failed to fetch records');
       }
-
     } catch (err) {
-
       console.error(err);
 
       setError('Backend connection failed');
-
     } finally {
-
       setLoading(false);
     }
   };
 
-
-
   return (
-
     <div
       style={{
         minHeight: '100%',
         background: '#020817',
         color: 'white',
-        padding: '40px'
+        padding: '40px',
       }}
     >
-
       <h1
         style={{
           fontSize: '42px',
-          marginBottom: '10px'
+          marginBottom: '10px',
         }}
       >
         Encrypted Healthcare Records
@@ -68,22 +50,13 @@ export function RecordsPage() {
       <p
         style={{
           color: '#94a3b8',
-          marginBottom: '40px'
+          marginBottom: '40px',
         }}
-      >
-      </p>
+      ></p>
 
-
-      {loading && (
-
-        <div style={{ color: '#22d3ee' }}>
-          Loading records...
-        </div>
-      )}
-
+      {loading && <div style={{ color: '#22d3ee' }}>Loading records...</div>}
 
       {error && (
-
         <div
           style={{
             background: '#450a0a',
@@ -91,47 +64,41 @@ export function RecordsPage() {
             padding: '12px',
             borderRadius: '10px',
             marginBottom: '20px',
-            color: '#f87171'
+            color: '#f87171',
           }}
         >
           {error}
         </div>
       )}
 
-
       <div
         style={{
           display: 'grid',
-          gap: '20px'
+          gap: '20px',
         }}
       >
-
         {records.map((record) => (
-
           <div
             key={record._id}
             style={{
               background: '#0f172a',
               border: '1px solid #164e63',
               borderRadius: '18px',
-              padding: '24px'
+              padding: '24px',
             }}
           >
-
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                marginBottom: '20px'
+                marginBottom: '20px',
               }}
             >
-
               <div>
-
                 <h2
                   style={{
                     color: '#22d3ee',
-                    fontSize: '22px'
+                    fontSize: '22px',
                   }}
                 >
                   {record.record_id}
@@ -140,34 +107,29 @@ export function RecordsPage() {
                 <div
                   style={{
                     color: '#94a3b8',
-                    fontSize: '14px'
+                    fontSize: '14px',
                   }}
                 >
                   Patient ID:
                   {record.patient_id}
                 </div>
-
               </div>
-
 
               <div
                 style={{
-                  color: '#4ade80'
+                  color: '#4ade80',
                 }}
               >
                 Encrypted ✓
               </div>
-
             </div>
-
 
             <div
               style={{
                 display: 'grid',
-                gap: '14px'
+                gap: '14px',
               }}
             >
-
               <div>
                 <strong>Encrypted Age:</strong>
                 <div>{record.encrypted_age}</div>
@@ -192,23 +154,17 @@ export function RecordsPage() {
                 <strong>Encrypted Risk Score:</strong>
                 <div>{record.encrypted_risk_score}</div>
               </div>
-
             </div>
-
 
             <div
               style={{
                 marginTop: '18px',
                 fontSize: '12px',
-                color: '#64748b'
+                color: '#64748b',
               }}
             >
-              Stored At:
-              {' '}
-              {new Date(record.timestamp)
-                .toLocaleString()}
+              Stored At: {new Date(record.timestamp).toLocaleString()}
             </div>
-
           </div>
         ))}
       </div>
@@ -216,96 +172,66 @@ export function RecordsPage() {
   );
 }
 
-
 export function ResultsPage() {
+  const [results, setResults] = React.useState([]);
 
-  const [results, setResults] =
-    React.useState([]);
+  const [loading, setLoading] = React.useState(true);
 
-  const [loading, setLoading] =
-    React.useState(true);
-
-  const [error, setError] =
-    React.useState('');
-
+  const [error, setError] = React.useState('');
 
   React.useEffect(() => {
-
     fetchResults();
-
   }, []);
 
-
-
   const fetchResults = async () => {
-
     try {
+      const response = await fetch('http://localhost:3000/api/results');
 
-      const response = await fetch(
-        'http://localhost:5000/api/results'
-      );
-
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (data.success) {
-
         setResults(data.results);
-
       } else {
-
-        setError(
-          'Failed to fetch results'
-        );
+        setError('Failed to fetch results');
       }
-
     } catch (err) {
-
       console.error(err);
 
-      setError(
-        'Backend connection failed'
-      );
-
+      setError('Backend connection failed');
     } finally {
-
       setLoading(false);
     }
   };
 
-
   const diseaseMap = {
+    0: 'None',
 
-  '0': 'None',
+    1: 'Diabetes',
 
-  '1': 'Diabetes',
+    2: 'Hypertension',
 
-  '2': 'Hypertension',
+    3: 'Cardiac Disease',
 
-  '3': 'Cardiac Disease',
+    4: 'Respiratory',
 
-  '4': 'Respiratory',
+    5: 'Neurological',
 
-  '5': 'Neurological',
-
-  null: 'Unknown'
-};
+    null: 'Unknown',
+  };
 
   return (
-
     <div
       style={{
         minHeight: '100%',
         background: '#020817',
         color: 'white',
-        padding: '40px'
+        padding: '40px',
       }}
     >
-
       <h1
         style={{
           fontSize: '42px',
-          marginBottom: '10px'
+          marginBottom: '10px',
         }}
       >
         Secure Computation Results
@@ -314,30 +240,23 @@ export function ResultsPage() {
       <p
         style={{
           color: '#94a3b8',
-          marginBottom: '40px'
+          marginBottom: '40px',
         }}
       >
-        Functional Encryption and MPC
-        computation history
+        Functional Encryption and MPC computation history
       </p>
 
-
-
       {loading && (
-
         <div
           style={{
-            color: '#22d3ee'
+            color: '#22d3ee',
           }}
         >
           Loading results...
         </div>
       )}
 
-
-
       {error && (
-
         <div
           style={{
             background: '#450a0a',
@@ -345,49 +264,41 @@ export function ResultsPage() {
             padding: '12px',
             borderRadius: '10px',
             marginBottom: '20px',
-            color: '#f87171'
+            color: '#f87171',
           }}
         >
           {error}
         </div>
       )}
 
-
-
       <div
         style={{
           display: 'grid',
-          gap: '20px'
+          gap: '20px',
         }}
       >
-
         {results.map((result) => (
-
           <div
             key={result._id}
             style={{
               background: '#0f172a',
               border: '1px solid #312e81',
               borderRadius: '18px',
-              padding: '24px'
+              padding: '24px',
             }}
           >
-
             <div
               style={{
                 display: 'flex',
-                justifyContent:
-                  'space-between',
-                marginBottom: '20px'
+                justifyContent: 'space-between',
+                marginBottom: '20px',
               }}
             >
-
               <div>
-
                 <h2
                   style={{
                     color: '#a78bfa',
-                    fontSize: '22px'
+                    fontSize: '22px',
                   }}
                 >
                   {result.result_id}
@@ -396,350 +307,242 @@ export function ResultsPage() {
                 <div
                   style={{
                     color: '#94a3b8',
-                    fontSize: '14px'
+                    fontSize: '14px',
                   }}
                 >
-                  Function:
-                  {' '}
-                  {result.function_type}
+                  Function: {result.function_type}
                 </div>
-
               </div>
-
 
               <div
                 style={{
-                  color: '#4ade80'
+                  color: '#4ade80',
                 }}
               >
                 Computed ✓
               </div>
-
             </div>
-
-
 
             <div
               style={{
                 display: 'grid',
-                gap: '14px'
+                gap: '14px',
               }}
             >
-
               <div>
+                <strong>Aggregate Output</strong>
 
-  <strong>
-    Aggregate Output
-  </strong>
-  
+                {typeof result.computed_value === 'object' ? (
+                  Object.entries(result.computed_value).map(([key, value]) => (
+                    <div
+                      key={key}
+                      style={{
+                        display: 'flex',
 
-  {typeof result.computed_value ===
-  'object'
+                        justifyContent: 'space-between',
 
-    ? Object.entries(
-        result.computed_value
-      ).map(([key, value]) => (
+                        alignItems: 'flex-start',
 
-        <div
-          key={key}
+                        gap: '20px',
 
-          style={{
-            display: 'flex',
+                        paddingBottom: '10px',
 
-            justifyContent:
-              'space-between',
+                        borderBottom: '1px solid rgba(255,255,255,0.05)',
+                      }}
+                    >
+                      <span
+                        style={{
+                          color: '#94a3b8',
 
-            alignItems: 'flex-start',
+                          textTransform: 'capitalize',
+                        }}
+                      >
+                        {key.replaceAll('_', ' ')}
+                      </span>
 
-            gap: '20px',
+                      <div
+                        style={{
+                          color: '#c4b5fd',
 
-            paddingBottom: '10px',
+                          fontWeight: 700,
 
-            borderBottom:
-              '1px solid rgba(255,255,255,0.05)'
-          }}
-        >
+                          textAlign: 'right',
 
-          <span
-            style={{
-              color: '#94a3b8',
+                          maxWidth: '60%',
 
-              textTransform:
-                'capitalize'
-            }}
-          >
-            {key.replaceAll(
-              '_',
-              ' '
-            )}
-          </span>
+                          whiteSpace: 'pre-wrap',
 
+                          wordBreak: 'break-word',
 
+                          fontSize: '12px',
 
-          <div
-            style={{
-              color: '#c4b5fd',
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        {Array.isArray(value)
+                          ? value.map((item, idx) => (
+                              <div
+                                key={idx}
+                                style={{
+                                  marginBottom: '10px',
 
-              fontWeight: 700,
+                                  paddingBottom: '10px',
 
-              textAlign: 'right',
+                                  borderBottom:
+                                    '1px solid rgba(255,255,255,0.05)',
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: 'flex',
 
-              maxWidth: '60%',
+                                    justifyContent: 'space-between',
+                                  }}
+                                >
+                                  <span>Disease</span>
 
-              whiteSpace:
-                'pre-wrap',
+                                  <span>
+                                    {diseaseMap[item.name] || item.name}
+                                  </span>
+                                </div>
 
-              wordBreak:
-                'break-word',
+                                <div
+                                  style={{
+                                    display: 'flex',
 
-              fontSize: '12px',
+                                    justifyContent: 'space-between',
 
-              fontFamily:
-                'monospace'
-            }}
-          >
+                                    marginTop: '4px',
+                                  }}
+                                >
+                                  <span>Count</span>
 
-            {Array.isArray(value)
+                                  <span>{item.count}</span>
+                                </div>
+                              </div>
+                            ))
+                          : typeof value === 'object'
+                            ? JSON.stringify(value, null, 2)
+                            : String(value)}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div
+                    style={{
+                      color: '#c4b5fd',
 
-  ? value.map((item, idx) => (
-
-      <div
-        key={idx}
-
-        style={{
-          marginBottom: '10px',
-
-          paddingBottom: '10px',
-
-          borderBottom:
-            '1px solid rgba(255,255,255,0.05)'
-        }}
-      >
-
-        <div
-          style={{
-            display: 'flex',
-
-            justifyContent:
-              'space-between'
-          }}
-        >
-
-          <span>
-            Disease
-          </span>
-
-          <span>
-            {diseaseMap[item.name] ||
-              item.name}
-          </span>
-
-        </div>
-
-        <div
-          style={{
-            display: 'flex',
-
-            justifyContent:
-              'space-between',
-
-            marginTop: '4px'
-          }}
-        >
-
-          <span>
-            Count
-          </span>
-
-          <span>
-            {item.count}
-          </span>
-
-        </div>
-
-      </div>
-    ))
-
-  : typeof value ===
-    'object'
-
-    ? JSON.stringify(
-        value,
-        null,
-        2
-      )
-
-    : String(value)}
-
-          </div>
-
-        </div>
-      ))
-
-    : (
-
-      <div
-        style={{
-          color: '#c4b5fd',
-
-          fontWeight: 700
-        }}
-      >
-        {String(
-          result.computed_value
-        )}
-      </div>
-    )}
-
-</div>
-
-
-</div>
+                      fontWeight: 700,
+                    }}
+                  >
+                    {String(result.computed_value)}
+                  </div>
+                )}
+              </div>
+            </div>
             <div
               style={{
                 marginTop: '18px',
                 fontSize: '12px',
-                color: '#64748b'
+                color: '#64748b',
               }}
             >
-              Generated At:
-              {' '}
-              {new Date(
-                result.generated_time
-              ).toLocaleString()}
+              Generated At: {new Date(result.generated_time).toLocaleString()}
             </div>
-
           </div>
         ))}
-
       </div>
-
     </div>
   );
 }
 
-
 export function KeysPage() {
-  const [rotatedKeys, setRotatedKeys] =
-  React.useState([]);
-  
+  const [rotatedKeys, setRotatedKeys] = React.useState([]);
 
   const keys = [
-
     {
-      title:
-        'FE Master Public Key',
+      title: 'FE Master Public Key',
 
-      algorithm:
-        'Functional Encryption',
+      algorithm: 'Functional Encryption',
 
       status: 'ACTIVE',
 
-      fingerprint:
-        'FEA7-91BC-442D',
+      fingerprint: 'FEA7-91BC-442D',
 
-      created:
-        '2026-05-02',
+      created: '2026-05-02',
 
-      rotation:
-        '90 days',
+      rotation: '90 days',
 
-      color: '#20c8a0'
+      color: '#20c8a0',
     },
 
-
-
     {
-      title:
-        'AES-256 Storage Key',
+      title: 'AES-256 Storage Key',
 
-      algorithm:
-        'AES-256-GCM',
+      algorithm: 'AES-256-GCM',
 
       status: 'ACTIVE',
 
-      fingerprint:
-        'AES9-2FCD-77AA',
+      fingerprint: 'AES9-2FCD-77AA',
 
-      created:
-        '2026-05-01',
+      created: '2026-05-01',
 
-      rotation:
-        '30 days',
+      rotation: '30 days',
 
-      color: '#0ea5e9'
+      color: '#0ea5e9',
     },
 
-
-
     {
-      title:
-        'MPC Session Coordinator Key',
+      title: 'MPC Session Coordinator Key',
 
-      algorithm:
-        'Shamir Secret Sharing',
+      algorithm: 'Shamir Secret Sharing',
 
       status: 'ACTIVE',
 
-      fingerprint:
-        'MPC4-88EF-102B',
+      fingerprint: 'MPC4-88EF-102B',
 
-      created:
-        '2026-05-05',
+      created: '2026-05-05',
 
-      rotation:
-        'Session-based',
+      rotation: 'Session-based',
 
-      color: '#8b5cf6'
+      color: '#8b5cf6',
     },
 
-
-
     {
-      title:
-        'FE Function Evaluation Key',
+      title: 'FE Function Evaluation Key',
 
-      algorithm:
-        'Inner Product FE',
+      algorithm: 'Inner Product FE',
 
       status: 'RESTRICTED',
 
-      fingerprint:
-        'FEK2-45AB-90DD',
+      fingerprint: 'FEK2-45AB-90DD',
 
-      created:
-        '2026-05-06',
+      created: '2026-05-06',
 
-      rotation:
-        'Dynamic',
+      rotation: 'Dynamic',
 
-      color: '#f59e0b'
-    }
-
+      color: '#f59e0b',
+    },
   ];
 
-
   return (
-
     <div
       style={{
         minHeight: '100%',
         background: '#020817',
         color: 'white',
-        padding: '40px'
+        padding: '40px',
       }}
     >
-
       <div
         style={{
-          marginBottom: 36
+          marginBottom: 36,
         }}
       >
-
         <h1
           style={{
             fontSize: '42px',
-            marginBottom: '12px'
+            marginBottom: '12px',
           }}
         >
           Key Management
@@ -749,60 +552,46 @@ export function KeysPage() {
           style={{
             color: '#94a3b8',
             maxWidth: '800px',
-            lineHeight: 1.6
+            lineHeight: 1.6,
           }}
         >
-          Administrative overview of
-          cryptographic key metadata
-          used across Functional Encryption,
-          AES storage encryption,
-          and MPC coordination services.
+          Administrative overview of cryptographic key metadata used across
+          Functional Encryption, AES storage encryption, and MPC coordination
+          services.
         </p>
-
       </div>
-
-
 
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns:
-            'repeat(auto-fit, minmax(320px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
 
-          gap: '24px'
+          gap: '24px',
         }}
       >
-
         {keys.map((key, index) => (
-
           <div
             key={index}
-
             style={{
               background: '#0f172a',
 
-              border:
-                `1px solid ${key.color}40`,
+              border: `1px solid ${key.color}40`,
 
               borderRadius: '20px',
 
-              padding: '24px'
+              padding: '24px',
             }}
           >
-
             <div
               style={{
                 display: 'flex',
 
-                justifyContent:
-                  'space-between',
+                justifyContent: 'space-between',
 
-                marginBottom: '18px'
+                marginBottom: '18px',
               }}
             >
-
               <div>
-
                 <div
                   style={{
                     fontSize: '20px',
@@ -811,7 +600,7 @@ export function KeysPage() {
 
                     fontWeight: 700,
 
-                    marginBottom: '6px'
+                    marginBottom: '6px',
                   }}
                 >
                   {key.title}
@@ -821,166 +610,116 @@ export function KeysPage() {
                   style={{
                     fontSize: '13px',
 
-                    color: '#94a3b8'
+                    color: '#94a3b8',
                   }}
                 >
                   {key.algorithm}
                 </div>
-
               </div>
-
-
 
               <div
                 style={{
                   height: 'fit-content',
 
-                  padding:
-                    '6px 12px',
+                  padding: '6px 12px',
 
-                  borderRadius:
-                    '999px',
+                  borderRadius: '999px',
 
                   fontSize: '11px',
 
                   fontWeight: 700,
 
-                  background:
-                    `${key.color}20`,
+                  background: `${key.color}20`,
 
-                  color: key.color
+                  color: key.color,
                 }}
               >
                 {key.status}
               </div>
-
             </div>
-
-
-          
-
 
             <div
               style={{
                 display: 'grid',
-                gap: '14px'
+                gap: '14px',
               }}
             >
-
               <div>
-                <strong>
-                  Key Fingerprint:
-                </strong>
+                <strong>Key Fingerprint:</strong>
 
                 <div
                   style={{
                     color: '#cbd5e1',
-                    marginTop: '4px'
+                    marginTop: '4px',
                   }}
                 >
                   {key.fingerprint}
                 </div>
               </div>
 
-
-
               <div>
-                <strong>
-                  Created:
-                </strong>
+                <strong>Created:</strong>
 
                 <div
                   style={{
                     color: '#cbd5e1',
-                    marginTop: '4px'
+                    marginTop: '4px',
                   }}
                 >
                   {key.created}
                 </div>
               </div>
 
-
-
               <div>
-                <strong>
-                  Rotation Policy:
-                </strong>
+                <strong>Rotation Policy:</strong>
 
                 <div
                   style={{
                     color: '#cbd5e1',
-                    marginTop: '4px'
+                    marginTop: '4px',
                   }}
                 >
                   {key.rotation}
                 </div>
               </div>
-
             </div>
 
-
-
             <button
+              disabled={rotatedKeys.includes(key.title)}
+              onClick={() => {
+                setRotatedKeys((prev) => [...prev, key.title]);
+              }}
+              style={{
+                marginTop: '24px',
 
-  disabled={
-    rotatedKeys.includes(key.title)
-  }
+                width: '100%',
 
-  onClick={() => {
+                padding: '12px',
 
-    setRotatedKeys(prev => [
-      ...prev,
-      key.title
-    ]);
-  }}
+                borderRadius: '12px',
 
-  style={{
-    marginTop: '24px',
+                border: `1px solid ${key.color}40`,
 
-    width: '100%',
+                background: rotatedKeys.includes(key.title)
+                  ? 'rgba(148,163,184,0.12)'
+                  : `${key.color}15`,
 
-    padding: '12px',
+                color: rotatedKeys.includes(key.title) ? '#94a3b8' : key.color,
 
-    borderRadius: '12px',
+                cursor: rotatedKeys.includes(key.title)
+                  ? 'not-allowed'
+                  : 'pointer',
 
-    border:
-      `1px solid ${key.color}40`,
+                fontWeight: 600,
 
-    background:
-      rotatedKeys.includes(key.title)
-        ? 'rgba(148,163,184,0.12)'
-        : `${key.color}15`,
-
-    color:
-      rotatedKeys.includes(key.title)
-        ? '#94a3b8'
-        : key.color,
-
-    cursor:
-      rotatedKeys.includes(key.title)
-        ? 'not-allowed'
-        : 'pointer',
-
-    fontWeight: 600,
-
-    opacity:
-      rotatedKeys.includes(key.title)
-        ? 0.7
-        : 1
-  }}
->
-
-  {rotatedKeys.includes(key.title)
-    ? 'Key Rotated'
-    : 'Rotate Key'}
-
-</button>
-
+                opacity: rotatedKeys.includes(key.title) ? 0.7 : 1,
+              }}
+            >
+              {rotatedKeys.includes(key.title) ? 'Key Rotated' : 'Rotate Key'}
+            </button>
           </div>
         ))}
-
       </div>
-
     </div>
   );
 }

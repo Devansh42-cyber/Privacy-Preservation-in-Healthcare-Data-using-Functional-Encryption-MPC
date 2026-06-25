@@ -1,7 +1,11 @@
 import csv
 import random
 
+<<<<<<< HEAD:generate_dataset.py
 NUM_RECORDS = 200
+=======
+NUM_RECORDS = 100
+>>>>>>> eb05598d18543fb7dc8990b99b53d63650874c4e:dataset_generator.py
 
 genders = [0, 1]
 
@@ -25,17 +29,11 @@ with open(output_file, mode="w", newline="") as file:
 
 
     for i in range(NUM_RECORDS):
-
         patient_id = f"P{1000 + i}"
-
         age = random.randint(18, 100)
-
         gender = random.choice(genders)
-
         disease = random.choice(diseases)
-
         blood_pressure = random.randint(60, 160)
-
         risk_score = random.randint(1, 100)
 
         writer.writerow([
