@@ -1,7 +1,7 @@
 import csv
 import random
 
-NUM_RECORDS = 10000
+NUM_RECORDS = 200
 
 genders = [0, 1]
 

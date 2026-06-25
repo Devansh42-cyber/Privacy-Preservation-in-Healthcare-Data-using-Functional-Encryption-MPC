@@ -896,7 +896,7 @@ app.get('/api/audit-logs', async (req, res) => {
       await AuditLog
         .find()
         .sort({ timestamp: -1 })
-        .limit(500);
+        .limit(600);
 
     res.json({
 
