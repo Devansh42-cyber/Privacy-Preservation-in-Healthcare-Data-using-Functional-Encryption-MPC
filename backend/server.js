@@ -552,16 +552,7 @@ app.get(
 
 app.get('/api/audit-logs', async (req, res) => {
   try {
-<<<<<<< HEAD
-
-    const logs =
-      await AuditLog
-        .find()
-        .sort({ timestamp: -1 })
-        .limit(600);
-=======
     const logs = await AuditLog.find().sort({ timestamp: -1 }).limit(500);
->>>>>>> eb05598d18543fb7dc8990b99b53d63650874c4e
 
     res.json({
       success: true,
