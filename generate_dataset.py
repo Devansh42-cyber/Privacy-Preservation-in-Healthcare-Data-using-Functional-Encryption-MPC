@@ -1,7 +1,11 @@
 import csv
 import random
 
+<<<<<<< HEAD:generate_dataset.py
+NUM_RECORDS = 200
+=======
 NUM_RECORDS = 100
+>>>>>>> eb05598d18543fb7dc8990b99b53d63650874c4e:dataset_generator.py
 
 genders = [0, 1]
 
